@@ -36,11 +36,10 @@ public class MainActivity extends Activity {
                     public void onTimeSet(TimePicker view, int hourOfDay,
                                           int minute) {
                         // セットされた時刻を取得してtextviewに反映
-                        textview.setText("設定時刻は " + hourOfDay + ":" + minute + " です");
-
+                        textview.setText(String.format("設定時刻は%02d:%02dです",hourOfDay,minute));
                         // 入力文字列を"input"に書き込むSharedPreferences.
-                        ed.putInt("input", hourOfDay * 60 + minute);
-                        ed.commit();
+                        //ed.putInt("input", hourOfDay * 60 + minute);
+                        //ed.commit();
                     }
                 }, date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE),
                 true);
