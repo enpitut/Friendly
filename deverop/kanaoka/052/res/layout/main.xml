@@ -9,6 +9,6 @@
         android:layout_height="wrap_content"
         android:text="@string/sample"
         android:id="@+id/textview"
-        />
+         />
 
 </LinearLayout>
