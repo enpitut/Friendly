@@ -1,4 +1,4 @@
-package cecile0207tz.myapplication;
+package cecile0207tz.startcounting;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

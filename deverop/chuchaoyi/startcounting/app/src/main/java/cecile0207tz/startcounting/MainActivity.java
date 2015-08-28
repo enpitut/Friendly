@@ -1,17 +1,26 @@
-package cecile0207tz.myapplication;
+package cecile0207tz.startcounting;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+
 public class MainActivity extends Activity {
-//adfgg
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -35,3 +44,5 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 }
+
+
