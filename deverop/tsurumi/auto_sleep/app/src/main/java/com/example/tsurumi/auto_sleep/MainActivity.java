@@ -44,6 +44,8 @@ import android.os.Handler;
 public class MainActivity extends Activity implements OnClickListener{
     AlertDialog.Builder alertDialogBuilder;
 
+    TimePickerDialog timePickerDialog;
+
     SharedPreferences sharedPref;
     SharedPreferences pref;
 
@@ -52,6 +54,9 @@ public class MainActivity extends Activity implements OnClickListener{
 
     Button writeButton;
     Button readButton;
+
+    //再設定ボタン
+    Button confbtn;
 
     //設定時間・保存時間
     String time;
@@ -88,7 +93,7 @@ public class MainActivity extends Activity implements OnClickListener{
         // カレンダーインスタンスを取得
         Calendar date = Calendar.getInstance();
         // TimePickerDialogインスタンスを生成
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+        timePickerDialog = new TimePickerDialog(this,
                 new TimePickerDialog.OnTimeSetListener() {
                     public void onTimeSet(TimePicker view,int hourOfDay,
                                           int minute) {
@@ -132,6 +137,8 @@ public class MainActivity extends Activity implements OnClickListener{
         dateTimeView = (TextView)findViewById(R.id.dateTimeView);
         debug = (TextView)findViewById(R.id.debug);
 
+        confbtn = (Button)findViewById(R.id.confbtn);
+
     }
 
     protected void setListeners() {
@@ -167,6 +174,14 @@ public class MainActivity extends Activity implements OnClickListener{
                     mTimer = new Timer(true);
                     mTimer.schedule( timerTask, 1000, 1000);
                 }
+            }
+        });
+
+        confbtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // ダイアログを表示
+                timePickerDialog.show();
             }
         });
     }

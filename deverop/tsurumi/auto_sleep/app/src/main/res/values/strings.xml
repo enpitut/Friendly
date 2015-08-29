@@ -7,5 +7,6 @@
 
     <string name="readButton">read</string>
     <string name="writeButton">write</string>
+    <string name="confbtn">再設定</string>
 
 </resources>
