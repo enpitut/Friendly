@@ -2,12 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:gravity="center_horizontal"
     android:orientation="vertical" >
-
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ask_sleeptime"
+        android:textColor="#30303f"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginTop="50dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/sample"
+        android:textColor="#30303f"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:layout_marginTop="50dp"
         android:id="@+id/textview" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="68dp"
+        android:text="@string/next"
+        android:textColor="#aaaaaa"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:layout_marginTop="50dp"/>
+
 
 </LinearLayout>
