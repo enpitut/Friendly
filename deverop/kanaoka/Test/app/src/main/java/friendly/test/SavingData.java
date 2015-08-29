@@ -10,12 +10,12 @@ import android.preference.PreferenceManager;
 
 public class SavingData extends Activity {
 
-    public void Save(int h, int m) {
+    public void Save(int minute) {
         // "DataStore"という名前でインスタンスを生成
         SharedPreferences dataStore = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor ed = dataStore.edit();
         // 入力文字列を"input"に書き込むSharedPreferences.
-        ed.putInt("time", h * 60 + m);
+        ed.putInt("time", minute);
         ed.commit();
     }
 }

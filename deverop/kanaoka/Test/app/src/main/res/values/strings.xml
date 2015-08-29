@@ -3,5 +3,6 @@
 
     <string name="sample">時刻を設定してください</string>
     <string name="app_name">時刻設定</string>
-
+    <string name="ask_sleeptime">普段の就寝時間を教えてください</string>
+    <string name="next"> 次へ</string>
 </resources>

@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="普段の就寝時間を教えてください"
+        android:text="@string/ask_sleeptime"
         android:textColor="#30303f"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -24,7 +24,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="68dp"
-        android:text="次へ"
+        android:text="@string/next"
         android:textColor="#aaaaaa"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
