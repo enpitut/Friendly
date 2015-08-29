@@ -3,46 +3,76 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center_horizontal"
-    android:orientation="vertical" >
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ask_sleeptime"
-        android:textColor="#30303f"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:layout_marginTop="50dp"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="68dp"
-        android:text="@string/option"
-        android:textColor="#aaaaaa"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:layout_marginTop="50dp"/>
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sample"
-        android:textColor="#30303f"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:layout_marginTop="50dp"
-        android:id="@+id/textview" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="68dp"
-        android:text="@string/next"
-        android:textColor="#aaaaaa"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:layout_marginTop="50dp"/>
-
-    <ImageView
+    <FrameLayout
+        android:id="@+id/frameLayout1"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:src="@+id/image"
-        android:layout_marginTop="60dp"/>
+        android:layout_height="wrap_content">
 
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@mipmap/back"
+                android:contentDescription="@string/desk" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="250dp"
+                android:text="@string/ask_sleeptime"
+                android:textColor="#d0d0ff"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="68dp"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:textSize="25sp"
+                android:text="@string/option"
+                android:textColor="#cacaca"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/sample"
+                android:textColor="#d0d0ff"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="68dp"
+                android:layout_marginTop="30dp"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:textSize="25sp"
+                android:text="@string/next"
+                android:textColor="#cacaca"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
