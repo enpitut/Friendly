@@ -9,12 +9,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -34,8 +38,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.os.Handler;
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends Activity implements OnClickListener{
     AlertDialog.Builder alertDialogBuilder;
 
     SharedPreferences sharedPref;
@@ -43,15 +49,29 @@ public class MainActivity extends Activity {
 
     TextView textview;
     TextView readTextView;
-    //EditText writeEditText;
 
     Button writeButton;
     Button readButton;
 
+    //設定時間・保存時間
     String time;
     String str;
 
+    //preference保存時使用
     Editor e;
+
+    //スレッド作成時使用
+    MyTimerTask timerTask = null;
+    Timer   mTimer   = null;
+    Handler mHandler = new Handler();
+    float    mLaptime = 0.0f;
+
+    //現在時刻を格納
+    String datetime;
+    TextView dateTimeView;
+
+    //
+    TextView debug;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,9 +126,11 @@ public class MainActivity extends Activity {
         textview = (TextView) findViewById(R.id.textview);
 
         readTextView = (TextView)findViewById(R.id.textView1);
-        //writeEditText = (EditText)findViewById(R.id.editText1);
         writeButton = (Button)findViewById(R.id.writeButton);
         readButton = (Button)findViewById(R.id.readButton);
+
+        dateTimeView = (TextView)findViewById(R.id.dateTimeView);
+        debug = (TextView)findViewById(R.id.debug);
 
     }
 
@@ -122,63 +144,62 @@ public class MainActivity extends Activity {
                 //第一引数はキー名・第二引数は値
                 e.putString("key",time);
                 e.commit();
-
-
-            //外部ファイルからのデータ取得
-//                try{
-//                    File file = new File("c:¥¥tmp¥¥test.txt");
-//                    FileReader filereader = new FileReader(file);
-//
-//                    int ch = filereader.read();
-//                    while(ch != -1){
-//                        System.out.print((char)ch);
-//
-//                        ch = filereader.read();
-//                    }
-//                }catch(FileNotFoundException e){
-//                    System.out.println(e);
-//                }catch(IOException e){
-//                    System.out.println(e);
-//                }
             }
-
-
         });
 
         //preferenceへ保存したデータの取得
         readButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                pref = getSharedPreferences("sharedPref",MODE_PRIVATE);
+                pref = getSharedPreferences("sharedPref", MODE_PRIVATE);
                 str = pref.getString("key", "");
 
                 //取得したデータの可視化
                 readTextView.setText(str);
+
+                //デーモンスレッドを作成
+                //1000msごとに定期実行
+                if(mTimer == null){
+
+                    //タイマーの初期化処理
+                    timerTask = new MyTimerTask();
+                    mLaptime = 0.0f;
+                    mTimer = new Timer(true);
+                    mTimer.schedule( timerTask, 1000, 1000);
+                }
             }
         });
     }
 
+    @Override
+    public void onClick(View view) {
+    }
 
-    //ファイル出力による保存
-//    protected void saveText(){
-//        String message = "";
-//        String fileName = textview.getText().toString();
-//        String inputText = readTextView.getText().toString();
-//        try {
-//            FileOutputStream outStream = openFileOutput(fileName, MODE_PRIVATE);
-//            OutputStreamWriter writer = new OutputStreamWriter(outStream);
-//            writer.write(inputText);
-//            writer.flush();
-//            writer.close();
-//            message = "File saved.";
-//        } catch (FileNotFoundException e) {
-//            message = e.getMessage();
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            message = e.getMessage();
-//            e.printStackTrace();
-//        }
-//
-//        Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
-//    }
+    class MyTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            // mHandlerを通じてUI Threadへ処理をキューイング
+            mHandler.post( new Runnable() {
+                public void run() {
+                    //設定時間との比較
+                    pref = getSharedPreferences("sharedPref",MODE_PRIVATE);
+                    str = pref.getString("key", "");
+
+                    //現在時刻を取得
+                    Time time = new Time("Asia/Tokyo");
+                    time.setToNow();
+                    datetime = time.hour + ":" + time.minute ;
+
+                    dateTimeView.setText(datetime);
+
+                    //substring(x,y) : xとyの間の文字列を抜き出す
+                    //設定時間と現在時刻の比較
+                    if(str.equals(datetime)){
+                        debug.setText("できた！！！");
+                    }
+                }
+            });
+        }
+    }
 }
