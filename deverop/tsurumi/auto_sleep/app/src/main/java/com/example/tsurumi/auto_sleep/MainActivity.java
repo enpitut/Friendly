@@ -38,16 +38,20 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     AlertDialog.Builder alertDialogBuilder;
 
-    //設定保存_追加
     SharedPreferences sharedPref;
+    SharedPreferences pref;
+
     TextView textview;
     TextView readTextView;
     //EditText writeEditText;
+
+    Button writeButton;
     Button readButton;
-    Button filereadButton;
 
     String time;
+    String str;
 
+    Editor e;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,9 @@ public class MainActivity extends Activity {
         findViews();
         setListeners();
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE);
+        e = sharedPref.edit();
 
         // カレンダーインスタンスを取得
         Calendar date = Calendar.getInstance();
@@ -100,62 +107,78 @@ public class MainActivity extends Activity {
 
         readTextView = (TextView)findViewById(R.id.textView1);
         //writeEditText = (EditText)findViewById(R.id.editText1);
+        writeButton = (Button)findViewById(R.id.writeButton);
         readButton = (Button)findViewById(R.id.readButton);
-        filereadButton = (Button)findViewById(R.id.filereadButton);
 
     }
 
     protected void setListeners() {
+        writeButton.setOnClickListener(new OnClickListener(){
+
+            //ボタンを押すことで動作
+            @Override
+            public void onClick(View v){
+
+                //第一引数はキー名・第二引数は値
+                e.putString("key",time);
+                e.commit();
+
+
+            //外部ファイルからのデータ取得
+//                try{
+//                    File file = new File("c:¥¥tmp¥¥test.txt");
+//                    FileReader filereader = new FileReader(file);
+//
+//                    int ch = filereader.read();
+//                    while(ch != -1){
+//                        System.out.print((char)ch);
+//
+//                        ch = filereader.read();
+//                    }
+//                }catch(FileNotFoundException e){
+//                    System.out.println(e);
+//                }catch(IOException e){
+//                    System.out.println(e);
+//                }
+            }
+
+
+        });
+
+        //preferenceへ保存したデータの取得
         readButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-//                readTextView.setText(sharedPref.getString("data1", ""));
-                readTextView.setText(time);
-                saveText();
-            }
-        });
+                pref = getSharedPreferences("sharedPref",MODE_PRIVATE);
+                str = pref.getString("key", "");
 
-        filereadButton.setOnClickListener(new OnClickListener(){
-            @Override
-            public void onClick(View v){
-                try{
-                    File file = new File("c:¥¥tmp¥¥test.txt");
-                    FileReader filereader = new FileReader(file);
-
-                    int ch = filereader.read();
-                    while(ch != -1){
-                        System.out.print((char)ch);
-
-                        ch = filereader.read();
-                    }
-                }catch(FileNotFoundException e){
-                    System.out.println(e);
-                }catch(IOException e){
-                    System.out.println(e);
-                }
+                //取得したデータの可視化
+                readTextView.setText(str);
             }
         });
     }
 
-    protected void saveText(){
-        String message = "";
-        String fileName = textview.getText().toString();
-        String inputText = readTextView.getText().toString();
-        try {
-            FileOutputStream outStream = openFileOutput(fileName, MODE_PRIVATE);
-            OutputStreamWriter writer = new OutputStreamWriter(outStream);
-            writer.write(inputText);
-            writer.flush();
-            writer.close();
-            message = "File saved.";
-        } catch (FileNotFoundException e) {
-            message = e.getMessage();
-            e.printStackTrace();
-        } catch (IOException e) {
-            message = e.getMessage();
-            e.printStackTrace();
-        }
 
-        Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
-    }
+    //ファイル出力による保存
+//    protected void saveText(){
+//        String message = "";
+//        String fileName = textview.getText().toString();
+//        String inputText = readTextView.getText().toString();
+//        try {
+//            FileOutputStream outStream = openFileOutput(fileName, MODE_PRIVATE);
+//            OutputStreamWriter writer = new OutputStreamWriter(outStream);
+//            writer.write(inputText);
+//            writer.flush();
+//            writer.close();
+//            message = "File saved.";
+//        } catch (FileNotFoundException e) {
+//            message = e.getMessage();
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            message = e.getMessage();
+//            e.printStackTrace();
+//        }
+//
+//        Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
+//    }
 }

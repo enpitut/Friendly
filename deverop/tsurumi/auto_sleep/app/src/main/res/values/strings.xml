@@ -6,6 +6,6 @@
     <string name="action_settings">アクションセッティング</string>
 
     <string name="readButton">read</string>
-    <string name="filereadButton">fileread</string>
+    <string name="writeButton">write</string>
 
 </resources>
