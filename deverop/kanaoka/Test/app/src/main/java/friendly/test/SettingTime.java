@@ -13,29 +13,35 @@ import android.widget.TimePicker;
 import java.util.Calendar;
 
 public class SettingTime  extends Activity{
-    private int convert_minute;
+    private int convert_minute = 0;
 
     public int set_time() {
-        // TextViewインスタンスを取得(結果表示用)
-        final TextView textview = (TextView) findViewById(R.id.textview);
+        TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                convert_minute = 60 * hourOfDay + minute;
+            }
+        };
+
+
+        Calendar calendar = Calendar.getInstance();
+        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute =  calendar.get(Calendar.MINUTE);
+
         // カレンダーインスタンスを取得
         Calendar date = Calendar.getInstance();
 
+
         // TimePickerDialogインスタンスを生成
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        // セットされた時刻を取得してtextviewに反映
-                        textview.setText(String.format("設定時刻は%02d:%02dです", hourOfDay, minute));
-                        convert_minute = 60 * hourOfDay + minute;
-                    }
-                }, date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE), true
-        );
+       TimePickerDialog timePickerDialog = new TimePickerDialog(this, android.R.style.Theme_Black,
+                onTimeSetListener, hourOfDay, minute, true);
+
+
         // タイトルをセット
         timePickerDialog.setTitle("時刻設定");
         // ダイアログを表示
         timePickerDialog.show();
+
 
         return convert_minute;
     }
