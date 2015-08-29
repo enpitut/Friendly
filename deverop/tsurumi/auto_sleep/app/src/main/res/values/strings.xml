@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="sample">サンプルメッセージ</string>
+    <string name="app_name">サンプル</string>
+    <string name="action_settings">アクションセッティング</string>
+
+    <string name="readButton">read</string>
+    <string name="filereadButton">fileread</string>
+
+</resources>
