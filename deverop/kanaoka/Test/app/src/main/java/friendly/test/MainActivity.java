@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements OnClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // TextViewインスタンスを取得(結果表示用)
-        final TextView textview = (TextView) findViewById(R.id.textview);
+       textview = (TextView) findViewById(R.id.show_textview);
         ImageView img = (ImageView) findViewById(R.id.image);
         setContentView(R.layout.activity_main);
 
@@ -105,15 +105,17 @@ public class MainActivity extends Activity implements OnClickListener{
                     public void onTimeSet(TimePicker view, int hourOfDay,
                                           int minute) {
                         // セットされた時刻を取得してtextviewに反映
-                        textview.setText(String.format("%02d:%02d",hourOfDay,minute));
+                        textview.setText(String.format("%02d : %02d",hourOfDay,minute));
                         time = Integer.toString(hourOfDay) + ":" + Integer.toString(minute);
                     }
                 }, date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE),
                 true);
+
         // タイトルをセット
         timePickerDialog.setTitle("タイトル");
         // ダイアログを表示
         timePickerDialog.show();
+        textview = (TextView) findViewById(R.id.show_textview);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -132,7 +134,7 @@ public class MainActivity extends Activity implements OnClickListener{
     }
     protected void findViews(){
         // TextViewインスタンスを取得(結果表示用)
-        textview = (TextView) findViewById(R.id.textview);
+        textview = (TextView) findViewById(R.id.show_textview);
 
         //readTextView = (TextView)findViewById(R.id.textView1);
         //writeButton = (Button)findViewById(R.id.writeButton);
@@ -146,6 +148,7 @@ public class MainActivity extends Activity implements OnClickListener{
     }
 
     protected void setListeners() {
+       /*
         writeButton.setOnClickListener(new OnClickListener(){
 
             //ボタンを押すことで動作
@@ -157,8 +160,10 @@ public class MainActivity extends Activity implements OnClickListener{
                 e.commit();
             }
         });
-
+        */
         //preferenceへ保存したデータの取得
+
+        /*
         readButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,6 +185,7 @@ public class MainActivity extends Activity implements OnClickListener{
                 }
             }
         });
+        */
 
         confbtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -215,7 +221,7 @@ public class MainActivity extends Activity implements OnClickListener{
                     //substring(x,y) : xとyの間の文字列を抜き出す
                     //設定時間と現在時刻の比較
                     if(str.equals(datetime)){
-                        debug.setText("できた！！！");
+            //            debug.setText("できた！！！");
                     }
                 }
             });

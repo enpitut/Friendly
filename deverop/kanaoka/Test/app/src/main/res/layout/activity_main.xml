@@ -54,7 +54,7 @@
                 android:layout_gravity="center_horizontal" />
 
             <TextView
-                android:id="@+id/textview"
+                android:id="@+id/show_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -62,7 +62,8 @@
                 android:textColor="#d0d0ff"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal"
+                android:key="time_key"/>
 
             <Button
                 android:layout_width="wrap_content"
