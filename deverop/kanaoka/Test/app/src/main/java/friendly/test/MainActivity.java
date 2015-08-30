@@ -97,6 +97,10 @@ public class MainActivity extends Activity implements OnClickListener{
         sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE);
         e = sharedPref.edit();
 
+        //読み込み
+        pref = getSharedPreferences("sharedPref", MODE_PRIVATE);
+        str = pref.getString("key", "");
+        textview.setText(str);
 // カレンダーインスタンスを取得
         Calendar date = Calendar.getInstance();
         // TimePickerDialogインスタンスを生成
@@ -107,15 +111,18 @@ public class MainActivity extends Activity implements OnClickListener{
                         // セットされた時刻を取得してtextviewに反映
                         textview.setText(String.format("%02d : %02d",hourOfDay,minute));
                         time = Integer.toString(hourOfDay) + ":" + Integer.toString(minute);
+                        e.putString("key",time);
+                        e.commit();
                     }
                 }, date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE),
                 true);
 
         // タイトルをセット
         timePickerDialog.setTitle("タイトル");
-        // ダイアログを表示
-        timePickerDialog.show();
+
+        //変更後に表示
         textview = (TextView) findViewById(R.id.show_textview);
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
