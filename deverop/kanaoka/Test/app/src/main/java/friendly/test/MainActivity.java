@@ -191,7 +191,9 @@ public class MainActivity extends Activity implements OnClickListener{
                     time_hour = pref.getInt("key_hour", -1);
                     time_minute = pref.getInt("key_minute",-1);
 
+                    time_hour += 24;                            //マイナスにならない
                     time_hour -= pre_start_time;                //アラーム用の時間遡及
+                    time_hour %= 24;                            //0~23
 
                     str = String.format("%02d : %02d",time_hour,time_minute);
                     //現在時刻を取得
