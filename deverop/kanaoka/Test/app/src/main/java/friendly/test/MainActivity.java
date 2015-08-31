@@ -54,17 +54,22 @@ public class MainActivity extends Activity implements OnClickListener{
     SharedPreferences pref;
 
     TextView textview;
-    TextView readTextView;
 
-    Button writeButton;
-    Button readButton;
+    //計測開始までの遡及時間
+    final int pre_start_time = 10;
 
     //再設定ボタン
     Button confbtn;
 
     //設定時間・保存時間
-    String time;
-    String str;
+    String str;     //  比較用
+
+    int time_minute;    //アプリの開始の比較用
+    int time_hour;      //アプリの開始の比較用
+
+    int pre_hour;       //時間の保存用
+    int pre_minute;     //分の保存用
+
 
     //preference保存時使用
     Editor e;
@@ -77,45 +82,58 @@ public class MainActivity extends Activity implements OnClickListener{
 
     //現在時刻を格納
     String datetime;
-    TextView dateTimeView;
 
-    //
+    //計測開始のメッセージ
     TextView debug;
 
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // TextViewインスタンスを取得(結果表示用)
-       textview = (TextView) findViewById(R.id.show_textview);
-        ImageView img = (ImageView) findViewById(R.id.image);
-        setContentView(R.layout.activity_main);
+        ImageView img = (ImageView) findViewById(R.id.image);       //画像を取得
+        setContentView(R.layout.activity_main);                     //レイアウトの取得
 
         findViews();
         setListeners();
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref = getSharedPreferences("sharedPref", MODE_PRIVATE);
         e = sharedPref.edit();
 
         //読み込み
         pref = getSharedPreferences("sharedPref", MODE_PRIVATE);
-        str = pref.getString("key", "");
-        textview.setText(str);
+        time_hour = pref.getInt("key_hour", -1);
+        time_minute = pref.getInt("key_minute",-1);
+        str = String.format("%02d : %02d",time_hour,time_minute);           //表示文字の準備
+        textview.setText(str);                                              //表示文字のセット
 // カレンダーインスタンスを取得
         Calendar date = Calendar.getInstance();
-        // TimePickerDialogインスタンスを生成
+        // TimePickerDialogインスタンスを生成(ダイアログの設定)
         timePickerDialog = new TimePickerDialog(this,
                 new TimePickerDialog.OnTimeSetListener() {
-                    public void onTimeSet(TimePicker view, int hourOfDay,
+                    public void onTimeSet(TimePicker view, int hourOfDay,       //ダイアログで設定された時の動作を記述
                                           int minute) {
                         // セットされた時刻を取得してtextviewに反映
                         textview.setText(String.format("%02d : %02d",hourOfDay,minute));
-                        time = Integer.toString(hourOfDay) + ":" + Integer.toString(minute);
-                        e.putString("key",time);
+                        pre_hour=hourOfDay;
+                        pre_minute=minute;
+                        e.putInt("key_hour",pre_hour);
+                        e.putInt("key_minute",pre_minute);
                         e.commit();
                     }
                 }, date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE),
                 true);
+
+        //デーモンスレッドを作成
+        //1000msごとに定期実行
+        if(mTimer == null){
+
+            //タイマーの初期化処理
+            timerTask = new MyTimerTask();
+            mLaptime = 0.0f;
+            mTimer = new Timer(true);
+            mTimer.schedule( timerTask, 1000, 1000);
+        }
 
         // タイトルをセット
         timePickerDialog.setTitle("タイトル");
@@ -142,59 +160,13 @@ public class MainActivity extends Activity implements OnClickListener{
     protected void findViews(){
         // TextViewインスタンスを取得(結果表示用)
         textview = (TextView) findViewById(R.id.show_textview);
-
-        //readTextView = (TextView)findViewById(R.id.textView1);
-        //writeButton = (Button)findViewById(R.id.writeButton);
-        //readButton = (Button)findViewById(R.id.readButton);
-
-        //dateTimeView = (TextView)findViewById(R.id.dateTimeView);
-        //debug = (TextView)findViewById(R.id.debug);
-
+        debug = (TextView)findViewById(R.id.debug);
         confbtn = (Button)findViewById(R.id.option);
-
     }
 
     protected void setListeners() {
-       /*
-        writeButton.setOnClickListener(new OnClickListener(){
 
-            //ボタンを押すことで動作
-            @Override
-            public void onClick(View v){
-
-                //第一引数はキー名・第二引数は値
-                e.putString("key",time);
-                e.commit();
-            }
-        });
-        */
-        //preferenceへ保存したデータの取得
-
-        /*
-        readButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pref = getSharedPreferences("sharedPref", MODE_PRIVATE);
-                str = pref.getString("key", "");
-
-                //取得したデータの可視化
-               // readTextView.setText(str);
-
-                //デーモンスレッドを作成
-                //1000msごとに定期実行
-                if(mTimer == null){
-
-                    //タイマーの初期化処理
-                    timerTask = new MyTimerTask();
-                    mLaptime = 0.0f;
-                    mTimer = new Timer(true);
-                    mTimer.schedule( timerTask, 1000, 1000);
-                }
-            }
-        });
-        */
-
-        confbtn.setOnClickListener(new OnClickListener() {
+        confbtn.setOnClickListener(new OnClickListener() {         //confbtnが押された時の動作
             @Override
             public void onClick(View view) {
                 // ダイアログを表示
@@ -215,20 +187,21 @@ public class MainActivity extends Activity implements OnClickListener{
             mHandler.post( new Runnable() {
                 public void run() {
                     //設定時間との比較
-                    pref = getSharedPreferences("sharedPref",MODE_PRIVATE);
-                    str = pref.getString("key", "");
+                    pref = getSharedPreferences("sharedPref", MODE_PRIVATE);
+                    time_hour = pref.getInt("key_hour", -1);
+                    time_minute = pref.getInt("key_minute",-1);
 
+                    time_hour -= pre_start_time;                //アラーム用の時間遡及
+
+                    str = String.format("%02d : %02d",time_hour,time_minute);
                     //現在時刻を取得
                     Time time = new Time("Asia/Tokyo");
                     time.setToNow();
-                    datetime = time.hour + ":" + time.minute ;
+                    datetime = String.format("%02d : %02d",time.hour,time.minute) ;
 
-                    dateTimeView.setText(datetime);
-
-                    //substring(x,y) : xとyの間の文字列を抜き出す
                     //設定時間と現在時刻の比較
                     if(str.equals(datetime)){
-            //            debug.setText("できた！！！");
+                        debug.setText("計測開始");
                     }
                 }
             });
