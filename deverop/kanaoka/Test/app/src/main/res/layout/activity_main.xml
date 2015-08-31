@@ -38,12 +38,13 @@
                 android:textColor="#d0d0ff"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:id="@+id/ask_sleeptime"
                 android:layout_gravity="center_horizontal" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="68dp"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 android:layout_marginTop="30dp"
                 android:paddingLeft="40dp"
                 android:paddingRight="40dp"
@@ -65,6 +66,18 @@
                 android:layout_gravity="center_horizontal"
                 android:key="time_key"/>
 
+            <TextView
+                android:id="@+id/debug"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/debug"
+                android:textColor="#d0d0ff"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal"
+                android:key="time_key"/>
+<!--
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="68dp"
@@ -75,6 +88,9 @@
                 android:text="@string/next"
                 android:textColor="#cacaca"
                 android:layout_gravity="center_horizontal" />
+-->
+
+
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>
