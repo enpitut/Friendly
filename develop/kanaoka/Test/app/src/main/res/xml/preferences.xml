@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
-        android:title="Data 1"
-        android:key="time_key"
-        android:summary="This is data1."/>
-</PreferenceScreen>
