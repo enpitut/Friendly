@@ -8,4 +8,7 @@
     <string name="option"> 設定する</string>
     <string name="desk"> 背景</string>
     <string name="debug"> </string>
+    <string name="log">ログの確認</string>
+    <string name="wakeup">起床</string>
+    <string name="sensor">センシング開始</string>
 </resources>
