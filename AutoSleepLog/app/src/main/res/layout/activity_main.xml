@@ -77,20 +77,34 @@
                 android:textStyle="bold"
                 android:layout_gravity="center_horizontal"
                 android:key="time_key"/>
-<!--
+
+            <!-- ログ閲覧への遷移 -->
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="68dp"
+                android:gravity="center"
                 android:layout_marginTop="30dp"
                 android:paddingLeft="40dp"
                 android:paddingRight="40dp"
                 android:textSize="25sp"
-                android:text="@string/next"
+                android:id="@+id/log"
+                android:text="@string/log"
                 android:textColor="#cacaca"
                 android:layout_gravity="center_horizontal" />
--->
 
-
+            <!-- センシング画面への遷移 -->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="68dp"
+                android:gravity="center"
+                android:layout_marginTop="30dp"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:textSize="25sp"
+                android:id="@+id/sensor"
+                android:text="@string/sensor"
+                android:textColor="#cacaca"
+                android:layout_gravity="center_horizontal" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

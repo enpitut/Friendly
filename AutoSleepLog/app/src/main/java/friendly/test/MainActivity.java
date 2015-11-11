@@ -60,6 +60,8 @@ public class MainActivity extends Activity implements OnClickListener{
 
     //再設定ボタン
     Button confbtn;
+    Button logbtn;
+    Button sensorbtn;
 
     //設定時間・保存時間
     String str;     //  比較用
@@ -86,6 +88,9 @@ public class MainActivity extends Activity implements OnClickListener{
     //計測開始のメッセージ
     TextView debug;
 
+    //センシングを行っているかのフラグ
+    boolean sensing_flag=false;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +111,7 @@ public class MainActivity extends Activity implements OnClickListener{
         time_minute = pref.getInt("key_minute",-1);
         str = String.format("%02d : %02d",time_hour,time_minute);           //表示文字の準備
         textview.setText(str);                                              //表示文字のセット
-// カレンダーインスタンスを取得
+        // カレンダーインスタンスを取得
         Calendar date = Calendar.getInstance();
         // TimePickerDialogインスタンスを生成(ダイアログの設定)
         timePickerDialog = new TimePickerDialog(this,
@@ -162,6 +167,9 @@ public class MainActivity extends Activity implements OnClickListener{
         textview = (TextView) findViewById(R.id.show_textview);
         debug = (TextView)findViewById(R.id.debug);
         confbtn = (Button)findViewById(R.id.option);
+
+        logbtn = (Button)findViewById(R.id.log);
+        sensorbtn = (Button)findViewById(R.id.sensor);
     }
 
     protected void setListeners() {
@@ -171,6 +179,28 @@ public class MainActivity extends Activity implements OnClickListener{
             public void onClick(View view) {
                 // ダイアログを表示
                 timePickerDialog.show();
+            }
+        });
+
+        //ログ閲覧画面へ遷移
+        logbtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent log_intent = new Intent();
+                //引数："パッケージ名"，"遷移先画面クラス名"
+                log_intent.setClassName("friendly.test","friendly.test.LogView");
+                startActivity(log_intent);
+            }
+        });
+
+        //センシング画面への遷移
+        sensorbtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sensor_intent = new Intent();
+                //引数："パッケージ名"，"遷移先画面クラス名"
+                sensor_intent.setClassName("friendly.test","friendly.test.SensingView");
+                startActivity(sensor_intent);
             }
         });
     }
@@ -204,6 +234,17 @@ public class MainActivity extends Activity implements OnClickListener{
                     //設定時間と現在時刻の比較
                     if(str.equals(datetime)){
                         debug.setText("計測開始");
+
+                        //センシング画面へ遷移
+                        //コピペしたら，毎秒intentを生成してしまった
+                        if(!sensing_flag){
+                            sensing_flag=true;
+                            Intent sensing_intent = new Intent();
+                            //引数："パッケージ名"，"遷移先画面クラス名"
+                            sensing_intent.setClassName("friendly.test", "friendly.test.SensingView");
+                            startActivity(sensing_intent);
+                        }
+                        ;
                     }
                 }
             });
