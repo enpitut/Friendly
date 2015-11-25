@@ -1,5 +1,9 @@
-#コメントアウト
-#無視したいファイル名を書き込む
-ログ.txt
-0824_発表資料_フレンドリー.pptx
+.gradle
+local.properties
+.idea/workspace.xml
+.idea/libraries
+.DS_Store
+build
+captures
 .idea
+*.iml
