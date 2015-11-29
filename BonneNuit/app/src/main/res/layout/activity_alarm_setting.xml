@@ -16,6 +16,15 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="アラームを設定"
+        android:id="@+id/set_button"
+        android:layout_above="@+id/delete_button"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="アラームを削除"
         android:id="@+id/delete_button"
         android:layout_alignParentBottom="true"

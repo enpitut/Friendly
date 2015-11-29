@@ -3,13 +3,19 @@ package com.example.sa__yuu_.bonnenuit;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TimePicker;
 
 import java.io.Serializable;
 import java.util.*;
@@ -20,22 +26,32 @@ public class AlarmActivity extends Activity {
     static final int TIME_DIALOG_ID = 0;
     ListView listView;
     ArrayList<AlarmStatus> alarmSettings;
+    AlarmListAdapter adapter;
+    static SQLiteDatabase mydb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
 
+        MySQLiteOpenHelper hlpr = new MySQLiteOpenHelper(getApplicationContext());
+        mydb = hlpr.getWritableDatabase();
+
         listView = (ListView)findViewById(R.id.list_view);
         alarmSettings = new ArrayList<>();
-        alarmSettings.add(new AlarmStatus(true, Calendar.getInstance()));
-        alarmSettings.add(new AlarmStatus(false, Calendar.getInstance()));
-        alarmSettings.add(new AlarmStatus(true, Calendar.getInstance()));
-        alarmSettings.add(new AlarmStatus(false, Calendar.getInstance()));
-        alarmSettings.add(new AlarmStatus(true, Calendar.getInstance()));
-        alarmSettings.add(new AlarmStatus(true, Calendar.getInstance()));
-        alarmSettings.add(new AlarmStatus(true, Calendar.getInstance()));
-        final AlarmListAdapter adapter = new AlarmListAdapter(this);
+
+        Cursor cursor = mydb.query("alarms", new String[]{"_id", "enable", "hour", "minute"}, null, null, null, null, "_id DESC");
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex("_id"));
+                int enable_int = cursor.getInt(cursor.getColumnIndex("enable"));
+                int hour = cursor.getInt(cursor.getColumnIndex("hour"));
+                int minute = cursor.getInt(cursor.getColumnIndex("minute"));
+                alarmSettings.add(new AlarmStatus(id, enable_int != 0, hour, minute));
+            } while (cursor.moveToNext());
+        }
+
+        adapter = new AlarmListAdapter(this);
         adapter.setAlarmList(alarmSettings);
         listView.setAdapter(adapter);
 
@@ -74,32 +90,50 @@ public class AlarmActivity extends Activity {
     }
 
     @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case TIME_DIALOG_ID:
-                return new TimePickerDialog(this, TimePickerDialog.THEME_HOLO_DARK, mTimeSetListener, mHour, mMinute, false);
-        }
-        return null;
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_alarm, menu);
+
+        return super.onCreateOptionsMenu(menu);
     }
 
-    // the callback received when the user "sets" the time in the dialog
-    private TimePickerDialog.OnTimeSetListener mTimeSetListener =
-            new TimePickerDialog.OnTimeSetListener() {
-                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    mHour = hourOfDay;
-                    mMinute = minute;
-                }
-            };
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        // Sub 画面を起動
+
+        //alarmSettings.add(new AlarmStatus(true, 10, 20));
+        //adapter.notifyDataSetChanged();
+
+        Intent intent = new Intent();
+        AlarmStatus clickedStatus = new AlarmStatus(false, 10, 10);
+        intent.putExtra("clickedStatus", clickedStatus);
+        intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmSettingActivity");
+        startActivity(intent);
+
+        return true;
+    }
 }
 
 class AlarmStatus implements Serializable {
     boolean enable;
+    int mHour, mMinute;
     long id;
-    Calendar calendar;
 
-    public AlarmStatus(boolean enable, Calendar calendar) {
+    public AlarmStatus(boolean enable, int mHour, int mMinute) {
+        this.id = -1;
         this.enable = enable;
-        this.calendar = calendar;
+        this.mHour = mHour;
+        this.mMinute = mMinute;
+    }
+
+    public AlarmStatus(long id, boolean enable, int mHour, int mMinute) {
+        this.id = id;
+        this.enable = enable;
+        this.mHour = mHour;
+        this.mMinute = mMinute;
     }
 
     public boolean getEnable() {
@@ -117,10 +151,24 @@ class AlarmStatus implements Serializable {
     public void toggle() { enable = !enable; }
 
     public String getAlarmTime() {
-        return String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+        return String.format("%02d:%02d", mHour, mMinute);
     }
+}
 
-    public void setCalendar(Calendar calendar) {
-        this.calendar = calendar;
+class MySQLiteOpenHelper extends SQLiteOpenHelper {
+    static final String DB = "bonneuit.db";
+    static final int DB_VERSION = 2;
+    static final String CREATE_TABLE = "create table alarms ( _id integer primary key autoincrement, enable boolean not null, hour integer not null, minute integer not null );";
+    static final String DROP_TABLE = "drop table alarms;";
+
+    public MySQLiteOpenHelper(Context c) {
+        super(c, DB, null, DB_VERSION);
+    }
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_TABLE);
+    }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(DROP_TABLE);
+        onCreate(db);
     }
 }
