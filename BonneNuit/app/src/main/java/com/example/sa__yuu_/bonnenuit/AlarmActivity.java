@@ -69,6 +69,7 @@ public class AlarmActivity extends Activity {
                 // 選択アイテムを取得
                 AlarmStatus clickedStatus = (AlarmStatus) adapter.getItem(position);
                 clickedStatus.toggle();
+                clickedStatus.update(mydb);
                 adapter.notifyDataSetChanged();
 
             }
