@@ -3,6 +3,7 @@ package com.example.sa__yuu_.bonnenuit;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,7 +18,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.io.Serializable;
 import java.util.*;
 
 public class AlarmActivity extends Activity {
@@ -114,61 +114,5 @@ public class AlarmActivity extends Activity {
         startActivity(intent);
 
         return true;
-    }
-}
-
-class AlarmStatus implements Serializable {
-    boolean enable;
-    int mHour, mMinute;
-    long id;
-
-    public AlarmStatus(boolean enable, int mHour, int mMinute) {
-        this.id = -1;
-        this.enable = enable;
-        this.mHour = mHour;
-        this.mMinute = mMinute;
-    }
-
-    public AlarmStatus(long id, boolean enable, int mHour, int mMinute) {
-        this.id = id;
-        this.enable = enable;
-        this.mHour = mHour;
-        this.mMinute = mMinute;
-    }
-
-    public boolean getEnable() {
-        return enable;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void toggle() { enable = !enable; }
-
-    public String getAlarmTime() {
-        return String.format("%02d:%02d", mHour, mMinute);
-    }
-}
-
-class MySQLiteOpenHelper extends SQLiteOpenHelper {
-    static final String DB = "bonneuit.db";
-    static final int DB_VERSION = 2;
-    static final String CREATE_TABLE = "create table alarms ( _id integer primary key autoincrement, enable boolean not null, hour integer not null, minute integer not null );";
-    static final String DROP_TABLE = "drop table alarms;";
-
-    public MySQLiteOpenHelper(Context c) {
-        super(c, DB, null, DB_VERSION);
-    }
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TABLE);
-    }
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(DROP_TABLE);
-        onCreate(db);
     }
 }
