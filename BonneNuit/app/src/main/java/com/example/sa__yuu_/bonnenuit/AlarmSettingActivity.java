@@ -95,6 +95,10 @@ public class AlarmSettingActivity extends Activity {
     private View.OnClickListener onDeleteButtonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (status.getId() != -1) {
+                mydb.delete("alarms", "_id = ?", new String[]{String.format("%d", status.getId())});
+            }
+
             Intent intent = new Intent();
             intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
             startActivity(intent);
