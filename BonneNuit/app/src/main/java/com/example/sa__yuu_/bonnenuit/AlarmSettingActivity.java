@@ -39,7 +39,7 @@ public class AlarmSettingActivity extends Activity {
         //timePicker.setMinute(status.mMinute);
         timePicker.setCurrentHour(status.mHour);
         timePicker.setCurrentMinute(status.mMinute);
-        
+
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 status.mHour = hourOfDay;
@@ -74,9 +74,9 @@ public class AlarmSettingActivity extends Activity {
         @Override
         public void onClick(View v) {
             if (status.getId() != -1) {
-                mydb.update("alarms", status.getContentValues(), "_id = ?", new String[]{String.format("%d", status.getId())});
+                status.update(mydb);
             } else {
-                mydb.insert("alarms", null, status.getContentValues());
+                status.insert(mydb);
             }
 
             Intent intent = new Intent();
@@ -90,7 +90,7 @@ public class AlarmSettingActivity extends Activity {
         @Override
         public void onClick(View v) {
             if (status.getId() != -1) {
-                mydb.delete("alarms", "_id = ?", new String[]{String.format("%d", status.getId())});
+                status.delete(mydb);
             }
 
             Intent intent = new Intent();

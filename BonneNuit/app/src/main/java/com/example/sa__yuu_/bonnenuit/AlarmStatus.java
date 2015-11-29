@@ -1,6 +1,7 @@
 package com.example.sa__yuu_.bonnenuit;
 import java.io.Serializable;
 import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 
 public class AlarmStatus implements Serializable {
     boolean enable;
@@ -39,11 +40,24 @@ public class AlarmStatus implements Serializable {
         return String.format("%02d:%02d", mHour, mMinute);
     }
 
-    public ContentValues getContentValues() {
+    // Database
+    private ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put("enable", enable);
         values.put("hour", mHour);
         values.put("minute", mMinute);
         return values;
+    }
+
+    public void insert(SQLiteDatabase db) {
+        db.insert("alarms", null, getContentValues());
+    }
+
+    public void update(SQLiteDatabase db) {
+        db.update("alarms", getContentValues(), "_id = ?", new String[]{String.format("%d", getId())});
+    }
+
+    public void delete(SQLiteDatabase db) {
+        db.delete("alarms", "_id = ?", new String[]{String.format("%d", getId())});
     }
 }
