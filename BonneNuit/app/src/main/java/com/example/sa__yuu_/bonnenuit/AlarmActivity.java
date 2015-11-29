@@ -108,7 +108,7 @@ public class AlarmActivity extends Activity {
         //adapter.notifyDataSetChanged();
 
         Intent intent = new Intent();
-        AlarmStatus clickedStatus = new AlarmStatus(false, 10, 10);
+        AlarmStatus clickedStatus = new AlarmStatus(true, 7, 30);
         intent.putExtra("clickedStatus", clickedStatus);
         intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmSettingActivity");
         startActivity(intent);
