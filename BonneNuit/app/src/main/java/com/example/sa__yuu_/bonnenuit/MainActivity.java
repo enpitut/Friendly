@@ -1,11 +1,15 @@
 package com.example.sa__yuu_.bonnenuit;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 import android.hardware.Sensor;
@@ -57,15 +61,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         graph.getViewport().setMinX(d1.getTime());
         graph.getViewport().setMaxX(d3.getTime());
         graph.getViewport().setXAxisBoundsManual(true);
-
-        // アプリを起動して10秒後にインテントを発動する
-        //GregorianCalendar gregorianCalendar = new GregorianCalendar();
-        //AlarmManager mng = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        //Intent intent = new Intent();
-        //intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
-        //startActivity(intent);
-        //PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
-        //mng.set(AlarmManager.RTC_WAKEUP, gregorianCalendar.getTimeInMillis() + 10 * 1000, pi);
     }
 
     @Override
