@@ -3,9 +3,12 @@ package com.example.sa__yuu_.bonnenuit;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,13 +33,23 @@ public class MainActivity extends Activity implements SensorEventListener {
     private SensorManager manager;
     private TextView textView;
 
+    private Vector3 previousAccelerometer;
+    private Vector3 currentAccelerometer;
+    private Vector3 deltaAccelerometer;
+
+    static SQLiteDatabase mydb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
-        textView = (TextView)findViewById(R.id.text_view);
-        manager = (SensorManager)getSystemService(SENSOR_SERVICE);
+
+        MySQLiteOpenHelper hlpr = new MySQLiteOpenHelper(getApplicationContext());
+        mydb = hlpr.getWritableDatabase();
+
+        textView = (TextView) findViewById(R.id.text_view);
+        manager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         Calendar calendar = Calendar.getInstance();
         Date d1 = calendar.getTime();
@@ -47,7 +60,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
                 new DataPoint(d1, 1),
                 new DataPoint(d2, 5),
                 new DataPoint(d3, 3)
@@ -80,7 +93,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         Intent intent = new Intent();
         intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
         startActivity(intent);
-        
+
         return true;
     }
 
@@ -90,7 +103,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         super.onResume();
         // Listenerの登録
         List<Sensor> sensors = manager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if(sensors.size() > 0) {
+        if (sensors.size() > 0) {
             Sensor s = sensors.get(0);
             manager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
         }
@@ -98,12 +111,38 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            String str = "加速度センサー値:"
-            + "\nX軸:" + event.values[SensorManager.DATA_X]
-            + "\nY軸:" + event.values[SensorManager.DATA_Y]
-            + "\nZ軸:" + event.values[SensorManager.DATA_Z];
-            //textView.setText(str);
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            previousAccelerometer = currentAccelerometer;
+            currentAccelerometer = new Vector3(
+                    event.values[SensorManager.DATA_X],
+                    event.values[SensorManager.DATA_Y],
+                    event.values[SensorManager.DATA_Z]
+            );
+
+            if(previousAccelerometer == null) {
+                deltaAccelerometer = Vector3.ZERO;
+            } else {
+                deltaAccelerometer = new Vector3();
+                deltaAccelerometer.set(currentAccelerometer);
+                deltaAccelerometer.subtract(previousAccelerometer);
+            }
+
+            String str = String.format("xyz: %f %f %f\n dx dy dz: %f %f %f",
+                    currentAccelerometer.x, currentAccelerometer.y, currentAccelerometer.z,
+                    deltaAccelerometer.x, deltaAccelerometer.y, deltaAccelerometer.z
+            );
+
+            ContentValues values = new ContentValues();
+            values.put("x", currentAccelerometer.x);
+            values.put("y", currentAccelerometer.y);
+            values.put("z", currentAccelerometer.z);
+            values.put("dx", deltaAccelerometer.x);
+            values.put("dy", deltaAccelerometer.y);
+            values.put("dz", deltaAccelerometer.z);
+            mydb.insert("accelerations", null, values);
+            Log.d("insert accelerations", "");
+
+            textView.setText(str);
         }
     }
 
