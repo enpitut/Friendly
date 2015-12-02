@@ -5,4 +5,6 @@
     <string name="add_alarm">Settings</string>
     <string name="title_activity_alarm">Alarm</string>
     <string name="title_activity_alarm_setting">AlarmSettingActivity</string>
+    <string name="title_activity_alarm_nortification">AlarmNortificationActivity</string>
+    <string name="action_settings">Settings</string>
 </resources>
