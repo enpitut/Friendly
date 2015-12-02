@@ -19,7 +19,7 @@ import java.util.GregorianCalendar;
 
 public class AlarmSettingActivity extends Activity {
 
-    private Button deleteButton, setButton;
+    private Button setButton;
     private TimePicker timePicker;
     private AlarmStatus status;
 
@@ -37,8 +37,6 @@ public class AlarmSettingActivity extends Activity {
 
         setButton = (Button) findViewById(R.id.set_button);
         setButton.setOnClickListener(onSetButtonClick);
-        deleteButton = (Button) findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(onDeleteButtonClick);
 
         timePicker = (TimePicker) findViewById(R.id.time_picker);
         //timePicker.setHour(status.mHour);
@@ -63,17 +61,15 @@ public class AlarmSettingActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_alarms) {
-            return true;
+        if (status.getId() != -1) {
+            status.delete(mydb);
         }
 
-        return super.onOptionsItemSelected(item);
+        Intent intent = new Intent();
+        intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
+        startActivity(intent);
+
+        return true;
     }
 
     private View.OnClickListener onSetButtonClick = new View.OnClickListener() {
@@ -107,20 +103,6 @@ public class AlarmSettingActivity extends Activity {
 
             // 下は一日ごとの繰り返しをするための設定だが、キャンセル処理が分からないのでコメントアウト
             //mng.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
-
-            Intent intent = new Intent();
-            intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
-            startActivity(intent);
-        }
-
-    };
-
-    private View.OnClickListener onDeleteButtonClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (status.getId() != -1) {
-                status.delete(mydb);
-            }
 
             Intent intent = new Intent();
             intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");

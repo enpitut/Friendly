@@ -142,7 +142,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             mydb.insert("accelerations", null, values);
             Log.d("insert accelerations", "");
 
-            textView.setText(str);
+            //textView.setText(str);
         }
     }
 
