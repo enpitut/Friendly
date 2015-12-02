@@ -81,7 +81,7 @@ public class AlarmSettingActivity extends Activity {
                 status.insert(mydb);
             }
 
-            // アプリを起動して10秒後にインテントを発動する
+            // 設定した時間にアラームを鳴らす
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.set(
                     calendar.get(GregorianCalendar.YEAR),
@@ -96,7 +96,7 @@ public class AlarmSettingActivity extends Activity {
 
             AlarmManager mng = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             Intent alarmIntent = new Intent();
-            alarmIntent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.MainActivity");
+            alarmIntent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmNotificationActivity");
             // TODO: 音を鳴らすActivityを作る
             PendingIntent pi = PendingIntent.getActivity(getBaseContext(), 0, alarmIntent, 0);
             mng.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pi);

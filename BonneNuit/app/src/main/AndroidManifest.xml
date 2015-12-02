@@ -25,6 +25,10 @@
             android:name=".AlarmSettingActivity"
             android:label="@string/title_activity_alarm_setting" >
         </activity>
+        <activity
+            android:name=".AlarmNotificationActivity"
+            android:label="@string/title_activity_alarm_nortification" >
+        </activity>
     </application>
 
 </manifest>
