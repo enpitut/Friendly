@@ -74,6 +74,13 @@ public class MainActivity extends Activity implements SensorEventListener {
         graph.getViewport().setMinX(d1.getTime());
         graph.getViewport().setMaxX(d3.getTime());
         graph.getViewport().setXAxisBoundsManual(true);
+
+
+        //Analyze.javaのメソッドを呼び出してテストする
+        Log.d(".", "call analyze");
+        Analyze.writeDB();
+        mydb = hlpr.getReadableDatabase();
+        Analyze.readDB();
     }
 
     @Override
