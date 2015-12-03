@@ -80,7 +80,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         Log.d(".", "call analyze");
         Analyze.writeDB();
         mydb = hlpr.getReadableDatabase();
-        Analyze.readDB();
+        Analyze.sleepCheck("x > ?", new String[] {"0.0"});
     }
 
     @Override
