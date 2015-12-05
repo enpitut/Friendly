@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -32,6 +33,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private SensorManager manager;
     private TextView textView;
+    private ImageButton alarmButton, settingButton;
 
     private Vector3 previousAccelerometer;
     private Vector3 currentAccelerometer;
@@ -50,6 +52,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         textView = (TextView) findViewById(R.id.text_view);
         manager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        alarmButton = (ImageButton) findViewById(R.id.alarm_button);
+        settingButton = (ImageButton) findViewById(R.id.setting_button);
+
+        alarmButton.setOnClickListener(onAlarmButtonClick);
+        settingButton.setOnClickListener(onSettingButtonClick);
 
         Calendar calendar = Calendar.getInstance();
         Date d1 = calendar.getTime();
@@ -85,19 +93,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        // Sub 画面を起動
-        Intent intent = new Intent();
-        intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
-        startActivity(intent);
-
-        return true;
-    }
-
-    @Override
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
@@ -119,7 +114,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                     event.values[SensorManager.DATA_Z]
             );
 
-            if(previousAccelerometer == null) {
+            if (previousAccelerometer == null) {
                 deltaAccelerometer = Vector3.ZERO;
             } else {
                 deltaAccelerometer = new Vector3();
@@ -150,4 +145,27 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
+
+    private View.OnClickListener onAlarmButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        }
+    };
+
+    private View.OnClickListener onSettingButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.SettingActivity");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        }
+    };
 }

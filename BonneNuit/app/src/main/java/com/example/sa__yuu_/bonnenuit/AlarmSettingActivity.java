@@ -43,6 +43,7 @@ public class AlarmSettingActivity extends Activity {
         //timePicker.setMinute(status.mMinute);
         timePicker.setCurrentHour(status.mHour);
         timePicker.setCurrentMinute(status.mMinute);
+        timePicker.setIs24HourView(true);
 
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
@@ -65,9 +66,7 @@ public class AlarmSettingActivity extends Activity {
             status.delete(mydb);
         }
 
-        Intent intent = new Intent();
-        intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
-        startActivity(intent);
+        finish();
 
         return true;
     }
@@ -97,16 +96,13 @@ public class AlarmSettingActivity extends Activity {
             AlarmManager mng = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             Intent alarmIntent = new Intent();
             alarmIntent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmNotificationActivity");
-            // TODO: 音を鳴らすActivityを作る
             PendingIntent pi = PendingIntent.getActivity(getBaseContext(), 0, alarmIntent, 0);
             mng.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pi);
 
             // 下は一日ごとの繰り返しをするための設定だが、キャンセル処理が分からないのでコメントアウト
             //mng.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
 
-            Intent intent = new Intent();
-            intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmActivity");
-            startActivity(intent);
+            finish();
         }
 
     };
