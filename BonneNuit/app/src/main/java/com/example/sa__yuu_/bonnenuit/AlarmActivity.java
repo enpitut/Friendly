@@ -16,12 +16,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.*;
 
 public class AlarmActivity extends Activity {
+
     private int mHour, mMinute;
+    private ImageButton chartButton, settingButton;
 
     static final int TIME_DIALOG_ID = 0;
     ListView listView;
@@ -36,6 +39,12 @@ public class AlarmActivity extends Activity {
 
         MySQLiteOpenHelper hlpr = new MySQLiteOpenHelper(getApplicationContext());
         mydb = hlpr.getWritableDatabase();
+
+        chartButton = (ImageButton) findViewById(R.id.chart_button);
+        settingButton = (ImageButton) findViewById(R.id.setting_button);
+
+        chartButton.setOnClickListener(onChartButtonClick);
+        settingButton.setOnClickListener(onSettingButtonClick);
 
         listView = (ListView)findViewById(R.id.list_view);
         alarmSettings = new ArrayList<>();
@@ -84,6 +93,7 @@ public class AlarmActivity extends Activity {
                 AlarmStatus clickedStatus = (AlarmStatus) adapter.getItem(position);
                 intent.putExtra("clickedStatus", clickedStatus);
                 intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmSettingActivity");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent);
                 return false;
             }
@@ -100,14 +110,6 @@ public class AlarmActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        // Sub 画面を起動
-
-        //alarmSettings.add(new AlarmStatus(true, 10, 20));
-        //adapter.notifyDataSetChanged();
-
         Intent intent = new Intent();
         AlarmStatus clickedStatus = new AlarmStatus(true, 7, 30);
         intent.putExtra("clickedStatus", clickedStatus);
@@ -116,4 +118,26 @@ public class AlarmActivity extends Activity {
 
         return true;
     }
+
+    private View.OnClickListener onChartButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.MainActivity");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        }
+    };
+
+    private View.OnClickListener onSettingButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.SettingActivity");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        }
+    };
 }
