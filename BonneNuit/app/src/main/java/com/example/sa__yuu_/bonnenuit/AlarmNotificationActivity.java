@@ -45,7 +45,8 @@ public class AlarmNotificationActivity extends Activity {
     private View.OnClickListener onStopButtonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            mp.stop();
+            mp.stop();Analyze.awake();
+
         }
 
     };

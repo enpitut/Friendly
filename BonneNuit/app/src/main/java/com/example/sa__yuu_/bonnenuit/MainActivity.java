@@ -26,6 +26,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainActivity extends Activity implements SensorEventListener {
@@ -78,9 +79,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         //Analyze.javaのメソッドを呼び出してテストする
         Log.d(".", "call analyze");
-        Analyze.writeDB();
         mydb = hlpr.getReadableDatabase();
-        Analyze.sleepCheck("x > ?", new String[] {"0.0"});
+        //sleepCheckで取得した寝た時間をデータベースに登録
+
+
     }
 
     @Override
@@ -150,6 +152,26 @@ public class MainActivity extends Activity implements SensorEventListener {
             Log.d("insert accelerations", "");
 
             //textView.setText(str);
+            if(Analyze.cnt == 0 && !Analyze.getsleeping()) {
+                Analyze.calendar2 = Calendar.getInstance();
+                Analyze.calendar2.add(Analyze.calendar2.SECOND, -30);//
+                //calendar2.add(calendar2.DATE, -5);
+                Analyze.startTime = Analyze.sdf.format(Analyze.calendar2.getTime());
+                Log.d("test", Analyze.startTime);
+                if (Analyze.sleepCheck("timestamp > ?", new String[]{Analyze.startTime}) && !Analyze.getsleeping()) {
+                    //Analyze.writeDB("sleeptime", "timestamp", startTime);
+                    Log.d("test", "awake!");
+                    Analyze.sleep();
+                } else {
+                    Log.d("test", "sleeping!");
+                }
+                Analyze.cnt++;
+            }else{
+                if(Analyze.cnt==200){Analyze.awake();}//debug
+                textView.setText(Analyze.showsleeping);
+                Analyze.cnt++;
+                Analyze.cnt %= 300;
+            }
         }
     }
 
