@@ -1,25 +1,19 @@
 package com.example.sa__yuu_.bonnenuit;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ContentValues;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
@@ -29,16 +23,9 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.text.DateFormat;
 import java.util.*;
 
-public class MainActivity extends Activity implements SensorEventListener {
-
-    private SensorManager manager;
+public class MainActivity extends Activity {
     private TextView textView;
     private ImageButton alarmButton, settingButton;
-
-    private Vector3 previousAccelerometer;
-    private Vector3 currentAccelerometer;
-    private Vector3 deltaAccelerometer;
-
     static SQLiteDatabase mydb;
 
     @Override
@@ -51,8 +38,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         mydb = hlpr.getWritableDatabase();
 
         textView = (TextView) findViewById(R.id.text_view);
-        manager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
         alarmButton = (ImageButton) findViewById(R.id.alarm_button);
         settingButton = (ImageButton) findViewById(R.id.setting_button);
 
@@ -82,6 +67,33 @@ public class MainActivity extends Activity implements SensorEventListener {
         graph.getViewport().setMinX(d1.getTime());
         graph.getViewport().setMaxX(d3.getTime());
         graph.getViewport().setXAxisBoundsManual(true);
+
+        Intent intent = new Intent(this, SensorService.class);
+        //stopService(intent);
+        startService(intent);
+
+        // SensorService が起動していなかったら起動
+        if(isServiceRunning(this, SensorService.class)) {
+            Log.d("INFO", "SensorService は既に起動済です。");
+        } else {
+            Log.d("INFO", "SensorService を起動します。");
+        }
+
+        // accelerations に値が保存させているかどうかを見るよう
+        getAccelerations();
+    }
+
+    public boolean isServiceRunning(Context c, Class<?> cls) {
+        ActivityManager am = (ActivityManager) c.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> runningService = am.getRunningServices(Integer.MAX_VALUE);
+        for (ActivityManager.RunningServiceInfo i : runningService) {
+            Log.d("", "service: " + i.service.getClassName() + " : " + i.started);
+            if (cls.getName().equals(i.service.getClassName())) {
+                Log.d("", "running");
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -91,61 +103,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         return super.onCreateOptionsMenu(menu);
     }
-
-    @Override
-    protected void onResume() {
-        // TODO Auto-generated method stub
-        super.onResume();
-        // Listenerの登録
-        List<Sensor> sensors = manager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if (sensors.size() > 0) {
-            Sensor s = sensors.get(0);
-            manager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
-        }
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            previousAccelerometer = currentAccelerometer;
-            currentAccelerometer = new Vector3(
-                    event.values[SensorManager.DATA_X],
-                    event.values[SensorManager.DATA_Y],
-                    event.values[SensorManager.DATA_Z]
-            );
-
-            if (previousAccelerometer == null) {
-                deltaAccelerometer = Vector3.ZERO;
-            } else {
-                deltaAccelerometer = new Vector3();
-                deltaAccelerometer.set(currentAccelerometer);
-                deltaAccelerometer.subtract(previousAccelerometer);
-            }
-
-            String str = String.format("xyz: %f %f %f\n dx dy dz: %f %f %f",
-                    currentAccelerometer.x, currentAccelerometer.y, currentAccelerometer.z,
-                    deltaAccelerometer.x, deltaAccelerometer.y, deltaAccelerometer.z
-            );
-
-            ContentValues values = new ContentValues();
-            values.put("x", currentAccelerometer.x);
-            values.put("y", currentAccelerometer.y);
-            values.put("z", currentAccelerometer.z);
-            values.put("dx", deltaAccelerometer.x);
-            values.put("dy", deltaAccelerometer.y);
-            values.put("dz", deltaAccelerometer.z);
-            mydb.insert("accelerations", null, values);
-            Log.d("insert accelerations", "");
-
-            //textView.setText(str);
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
 
     private View.OnClickListener onAlarmButtonClick = new View.OnClickListener() {
         @Override
@@ -168,4 +125,19 @@ public class MainActivity extends Activity implements SensorEventListener {
             startActivity(intent);
         }
     };
+
+    private void getAccelerations() {
+        Cursor cursor = mydb.rawQuery("SELECT _id, x, y, z, delta_length, timestamp FROM accelerations ORDER BY _id DESC LIMIT 50", new String[]{});
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex("_id"));
+                float x = cursor.getFloat(cursor.getColumnIndex("x"));
+                float y = cursor.getFloat(cursor.getColumnIndex("y"));
+                float z = cursor.getFloat(cursor.getColumnIndex("z"));
+                float delta_length = cursor.getFloat(cursor.getColumnIndex("delta_length"));
+                java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(cursor.getString(cursor.getColumnIndex("timestamp")));
+                Log.d("getAccelerations", String.format("%d ||%f %f %f|| = %f, %s", id, x, y, z, delta_length, timestamp));
+            } while (cursor.moveToNext());
+        }
+    }
 }

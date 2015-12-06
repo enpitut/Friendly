@@ -33,6 +33,12 @@
             android:name=".SettingActivity"
             android:label="@string/title_activity_setting" >
         </activity>
+
+        <service
+            android:name=".SensorService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
