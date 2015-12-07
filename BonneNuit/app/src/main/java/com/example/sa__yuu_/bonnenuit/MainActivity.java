@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,7 +24,21 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.text.DateFormat;
 import java.util.*;
 
+import lecho.lib.hellocharts.formatter.AxisValueFormatter;
+import lecho.lib.hellocharts.formatter.LineChartValueFormatter;
+import lecho.lib.hellocharts.formatter.ValueFormatterHelper;
+import lecho.lib.hellocharts.gesture.ContainerScrollType;
+import lecho.lib.hellocharts.gesture.ZoomType;
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.view.LineChartView;
+
 public class MainActivity extends Activity {
+    LineChartView chart;
     private TextView textView;
     private ImageButton alarmButton, settingButton;
     static SQLiteDatabase mydb;
@@ -37,36 +52,13 @@ public class MainActivity extends Activity {
         MySQLiteOpenHelper hlpr = new MySQLiteOpenHelper(getApplicationContext());
         mydb = hlpr.getWritableDatabase();
 
+        chart = (LineChartView) findViewById(R.id.chart);
         textView = (TextView) findViewById(R.id.text_view);
         alarmButton = (ImageButton) findViewById(R.id.alarm_button);
         settingButton = (ImageButton) findViewById(R.id.setting_button);
 
         alarmButton.setOnClickListener(onAlarmButtonClick);
         settingButton.setOnClickListener(onSettingButtonClick);
-
-        Calendar calendar = Calendar.getInstance();
-        Date d1 = calendar.getTime();
-        calendar.add(Calendar.HOUR, 1);
-        Date d2 = calendar.getTime();
-        calendar.add(Calendar.HOUR, 1);
-        Date d3 = calendar.getTime();
-
-
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
-                new DataPoint(d1, 1),
-                new DataPoint(d2, 5),
-                new DataPoint(d3, 3)
-        });
-        graph.addSeries(series);
-
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, DateFormat.getTimeInstance()));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
-
-        // set manual x bounds to have nice steps
-        graph.getViewport().setMinX(d1.getTime());
-        graph.getViewport().setMaxX(d3.getTime());
-        graph.getViewport().setXAxisBoundsManual(true);
 
         Intent intent = new Intent(this, SensorService.class);
         //stopService(intent);
@@ -81,6 +73,52 @@ public class MainActivity extends Activity {
 
         // accelerations に値が保存させているかどうかを見るよう
         getAccelerations();
+        drawGrapth();
+    }
+
+    private void drawGrapth() {
+        int i = 0;
+        List<PointValue> yValues = new ArrayList<PointValue>();
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        Cursor cursor = mydb.rawQuery("SELECT delta_length, timestamp FROM accelerations ORDER BY _id DESC LIMIT 60*10", new String[]{});
+        if (cursor.moveToFirst()) {
+            do {
+                float delta_length = cursor.getFloat(cursor.getColumnIndex("delta_length"));
+                java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(cursor.getString(cursor.getColumnIndex("timestamp")));
+                Date date = new Date(timestamp.getTime());
+
+                yValues.add(new PointValue(-i, delta_length));
+                AxisValue axisValue = new AxisValue(-i);
+                axisValue.setLabel(String.format("%02d:%02d", date.getHours(), date.getMinutes()));
+                axisValues.add(axisValue);
+
+                i++;
+            } while (cursor.moveToNext());
+        }
+
+        //In most cased you can call data model methods in builder-pattern-like manner.
+        Line line = new Line(yValues).setColor(Color.BLUE).setCubic(true).setStrokeWidth(5).setFilled(true);
+        List<Line> lines = new ArrayList<Line>();
+        lines.add(line);
+
+        LineChartData data = new LineChartData();
+        data.setLines(lines);
+        data.setAxisXBottom(new Axis(axisValues).setName("Time"));
+        data.setAxisYLeft(new Axis().setName("Awakeness"));
+
+        chart.setLineChartData(data);
+
+        chart.setInteractive(true);
+        chart.setZoomType(ZoomType.HORIZONTAL);
+        chart.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
+
+        final Viewport v = new Viewport(chart.getMaximumViewport());
+        v.top = 10; //example max value
+        v.bottom = 0;  //example min value
+        chart.setMaximumViewport(v);
+        chart.setCurrentViewport(v);
+        //Optional step: disable viewport recalculations, thanks to this animations will not change viewport automatically.
+        chart.setViewportCalculationEnabled(false);
     }
 
     public boolean isServiceRunning(Context c, Class<?> cls) {
@@ -127,7 +165,7 @@ public class MainActivity extends Activity {
     };
 
     private void getAccelerations() {
-        Cursor cursor = mydb.rawQuery("SELECT _id, x, y, z, delta_length, timestamp FROM accelerations ORDER BY _id DESC LIMIT 50", new String[]{});
+        Cursor cursor = mydb.rawQuery("SELECT _id, x, y, z, delta_length, timestamp FROM accelerations ORDER BY _id DESC LIMIT 5", new String[]{});
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(cursor.getColumnIndex("_id"));
