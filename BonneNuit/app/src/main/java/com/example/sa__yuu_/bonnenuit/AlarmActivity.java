@@ -49,14 +49,15 @@ public class AlarmActivity extends Activity {
         listView = (ListView)findViewById(R.id.list_view);
         alarmSettings = new ArrayList<>();
 
-        Cursor cursor = mydb.query("alarms", new String[]{"_id", "enable", "hour", "minute"}, null, null, null, null, "_id DESC");
+        Cursor cursor = mydb.query("alarms", new String[]{"_id", "enable", "day_of_week", "hour", "minute"}, null, null, null, null, "_id DESC");
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(cursor.getColumnIndex("_id"));
                 int enable_int = cursor.getInt(cursor.getColumnIndex("enable"));
+                int day_of_week = cursor.getInt(cursor.getColumnIndex("day_of_week"));
                 int hour = cursor.getInt(cursor.getColumnIndex("hour"));
                 int minute = cursor.getInt(cursor.getColumnIndex("minute"));
-                alarmSettings.add(new AlarmStatus(id, enable_int != 0, hour, minute));
+                alarmSettings.add(new AlarmStatus(id, enable_int != 0, day_of_week, hour, minute));
             } while (cursor.moveToNext());
         }
 
@@ -106,17 +107,6 @@ public class AlarmActivity extends Activity {
         inflater.inflate(R.menu.menu_alarm, menu);
 
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent();
-        AlarmStatus clickedStatus = new AlarmStatus(true, 7, 30);
-        intent.putExtra("clickedStatus", clickedStatus);
-        intent.setClassName("com.example.sa__yuu_.bonnenuit", "com.example.sa__yuu_.bonnenuit.AlarmSettingActivity");
-        startActivity(intent);
-
-        return true;
     }
 
     private View.OnClickListener onChartButtonClick = new View.OnClickListener() {
