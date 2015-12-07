@@ -5,19 +5,21 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class AlarmStatus implements Serializable {
     boolean enable;
-    int mHour, mMinute;
+    int mDayOfWeek, mHour, mMinute;
     long id;
 
-    public AlarmStatus(boolean enable, int mHour, int mMinute) {
+    public AlarmStatus(boolean enable, int mDayOfWeek, int mHour, int mMinute) {
         this.id = -1;
         this.enable = enable;
+        this.mDayOfWeek = mDayOfWeek;
         this.mHour = mHour;
         this.mMinute = mMinute;
     }
 
-    public AlarmStatus(long id, boolean enable, int mHour, int mMinute) {
+    public AlarmStatus(long id, boolean enable, int mDayOfWeek, int mHour, int mMinute) {
         this.id = id;
         this.enable = enable;
+        this.mDayOfWeek = mDayOfWeek;
         this.mHour = mHour;
         this.mMinute = mMinute;
     }
@@ -44,6 +46,7 @@ public class AlarmStatus implements Serializable {
     private ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put("enable", enable);
+        values.put("day_of_week", mDayOfWeek);
         values.put("hour", mHour);
         values.put("minute", mMinute);
         return values;
