@@ -14,16 +14,21 @@ class MySQLiteOpenHelper extends SQLiteOpenHelper {
     static final String CREATE_ACCELERATIONS_TABLE = "CREATE TABLE accelerations ( _id integer primary key autoincrement, x float not null, y float not null, z float not null, dx float not null, dy float not null, dz float not null, timestamp TIMESTAMP DEFAULT (DATETIME('now','localtime')) );";
     static final String DROP_ACCELERATIONS_TABLE = "DROP TABLE IF EXISTS accelerations;";
 
+    static final String CREATE_SLEEPTIME_TABLE = "CREATE TABLE sleeptime ( _id integer primary key autoincrement, sleeptime timestamp);";
+    static final String DROP_SLEEPTIME_TABLE = "DROP TABLE IF EXISTS sleeptime;";
+
     public MySQLiteOpenHelper(Context c) {
         super(c, DB, null, DB_VERSION);
     }
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_ALRMS_TABLE);
         db.execSQL(CREATE_ACCELERATIONS_TABLE);
+        db.execSQL(CREATE_SLEEPTIME_TABLE);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DROP_ALRMS_TABLE);
         db.execSQL(DROP_ACCELERATIONS_TABLE);
+        db.execSQL(DROP_SLEEPTIME_TABLE);
         onCreate(db);
     }
 }

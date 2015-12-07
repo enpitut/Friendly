@@ -28,22 +28,24 @@ static float[][] readDB(String where, String[] whereArgs)                       
 */
 package com.example.sa__yuu_.bonnenuit;
 
+import android.database.CursorIndexOutOfBoundsException;
 import android.util.Log;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import java.lang.String;
-import java.sql.Date;
+//import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import android.content.ContentValues;
 
 
 public class Analyze{
     static String DBTable = "accelerations";
-    static String[] DBcolumns = new String[] {"x", "y", "z", "dx", "dy", "dz"};
+    static String[] DBcolumns = new String[] {"x", "y", "z"};
     static String[] DB_timestamp = new String[]{"timestamp"};
     static String whereSample = "timestamp";
     static String whereArgsSample = "%2015-12-05%";
@@ -51,13 +53,15 @@ public class Analyze{
     static Calendar calendar2;
     static String startTime;
     static String showsleeping = "awake";
-    static int cnt = 0;
+    static int cnt = 0, cnt2 = 0;
 
+    protected static String sleeptime = "empty";
     private static float[] x = new float[40000], y = new float[40000], z = new float[40000], dx = new float[40000], dy = new float[40000], dz = new float[40000];
     private static float[] deltaAbsAcc = new float[40000];
     private static Vector3[] acc = new Vector3[40000], dltAcc = new Vector3[40000];
     private static float[][] fltData;
     private static boolean sleeping;
+    private static Cursor csracc;
 
     // SleepCheck:就寝判定を行なって、タイムスタンプを返す
     public static boolean sleepCheck(String where, String[] whereArgs){
@@ -86,30 +90,45 @@ public class Analyze{
                         tmpvct = z;
                         tmpidx = 2;
                         break;
-                    case 3:
-                        tmpvct = dx;
-                        tmpidx = 3;
-                        break;
-                    case 4:
-                        tmpvct = dy;
-                        tmpidx = 4;
-                        break;
-                    case 5:
-                        tmpvct = dz;
-                        tmpidx = 5;
-                        break;
                 }
                 insertArray(tmpvct, fltData, tmpidx);
             }
 
             insertVector(acc, x, y, z);                         //前に処理したものについてacc,dltaccに流し込み、以降それぞれvecとして扱える
-            insertVector(dltAcc, dx, dy, dz);
+            //insertVector(dltAcc, dx, dy, dz);
+            dltAcc = calcDeltaVector(acc);                      //DBにdx,dy,dzを用意しなくてもdltaccをここで計算
 
-            if (smallerAbsDltAcc(dltAcc) && smallerDeltaAbsAcc(acc)) {
+            if (smallerAbsDltAcc(dltAcc) || smallerDeltaAbsAcc(acc)) {
                 return true;
             }
         }
         return false;
+    }
+
+    protected static String sleepCheck2(String where, String[] whereArgs){
+        Log.d("sleepCheckLight", "start");
+        if(getsleeping()){
+            Log.i("sleepcheck2", "already sleeping");
+            return sleeptime;
+        }
+        else{
+            preparedReadDB(where, whereArgs);
+            for(int i = 0; ; i++){
+                if(readDBL(i + 1) == Vector3.ZERO){
+                    Log.e("sleepcheck2", "DB is end");
+                    return "unknown";
+                }
+                else {
+                    if (smallerAbsDltAcc(calcDeltaVector(new Vector3[]{readDBL(i), readDBL(i + 1)}))
+                            && smallerDeltaAbsAcc(new Vector3[]{readDBL(i)})) {
+                        //sleeptime = commitSleepTime();
+                        //sleep(sleeptime);
+                        //return sleeptime;
+                        if(cnt2++ >= 300) return startTime;
+                    }
+                }
+            }
+        }
     }
 
     //睡眠中の判定を解除
@@ -118,13 +137,27 @@ public class Analyze{
         showsleeping = "awake!!";
     }
     //睡眠中の判定に変更
+
     public static void sleep(){
         sleeping = true;
         showsleeping = "sleeping...";
     }
 
+    public static void sleep(String strTimestamp){
+        sleeping = true;
+        showsleeping = strTimestamp;
+    }
+
     public static boolean getsleeping(){
         return sleeping;
+    }
+
+    private static String commitSleepTime(){
+        Date date = new Date();
+        String currentTime = sdf.format(date);
+        writeDB("sleeptime", "sleeptime", currentTime);
+        Log.i("commitSleepTime", currentTime);
+        return currentTime;
     }
 
     //加速度の差の絶対値が閾値以下かを判定
@@ -139,7 +172,7 @@ public class Analyze{
                 break;
             }
         }
-        for(int i = 1; i < absVct.length; i++){
+        for(int i = 0; i < absVct.length; i++){
             if(absVct[i] > 5.0){
                     return false;
             }
@@ -155,7 +188,7 @@ public class Analyze{
         deltaVctLeng = calcDelta(vctArray);
         for(int i = 0; i < deltaVctLeng.length; i++){
             try{
-                if(deltaVctLeng[i] > 15.0){
+                if(deltaVctLeng[i] > 0.0){
                      return false;
                 }
             }catch(NullPointerException e){
@@ -187,19 +220,28 @@ public class Analyze{
                 }
             }
     }
+    protected static Vector3[] calcDeltaVector(Vector3[] vct){
+        Vector3[] deltaVector = new Vector3[vct.length];
+        for(int i = 1; i < vct.length; i++){
+            vct[i].subtract(vct[i - 1]);
+            //deltaVector[i - 1].set(vct[i]);
+            deltaVector[i - 1] = new Vector3(vct[i]);
+        }
+        return deltaVector;
+    }
 
     //加速度ベクタの絶対値の差分を計算
     private static float[] calcDelta(Vector3[] vect){
         float[] tempAbsVect = new float[40000];
         float[] deltaAbsVct = new float[40000];
-        for(int i = 0; i < x.length; i++){
+        for(int i = 0; i < vect.length; i++){
             try{
                 tempAbsVect[i] = vect[i].length();
             }catch(NullPointerException e){
                 break;
             }
         }
-        for(int i = 1; i < x.length; i++){
+        for(int i = 1; i < vect.length; i++){
             try{
                 deltaAbsVct[i - 1] = tempAbsVect[i] - tempAbsVect[i - 1];
             }catch(NullPointerException e){
@@ -216,13 +258,13 @@ public class Analyze{
     protected static float[][] readDB(String where, String[] whereArgs){
         float[][] fltCusor = new float[10][40000];
         Log.d("readDB", "readDB");
-        float xVal;
+        float xVal = 0;
         Cursor csr = MainActivity.mydb.query(DBTable, DBcolumns,
                 where, whereArgs, null, null, null, null);
         if(csr.getCount() == 0) Log.e("readDB", "----------the number of records is 0----------");
         Log.i("readDB", "recordCount, columnCount : " + String.valueOf(csr.getCount()) + " " + String.valueOf(csr.getColumnCount()));
         csr.moveToFirst();
-        xVal = csr.getFloat(0);
+        //xVal = csr.getFloat(0);
         Log.d("readDB", String.valueOf(xVal));
         Log.d("readDB", "Getcount:"+String.valueOf(csr.getCount()));
 
@@ -237,13 +279,45 @@ public class Analyze{
                         Log.d("error","ぬるぽ");
                         break;
                     }catch(ArrayIndexOutOfBoundsException e){
-                break;
-            }
+                        break;
+                    }
                 }
             csr.moveToNext();
         }
         return fltCusor;
     }
+
+    private static boolean preparedReadDB(String where, String[] whereArgs){
+        Log.d("preparedReadDB", "start");
+        csracc = MainActivity.mydb.query(DBTable, DBcolumns, where, whereArgs, null, null, null, null);
+        if(csracc.getCount() == 0) {
+            Log.e("preparedReadDB", "the number of record is 0");
+            return false;
+        }
+        else {
+            Log.i("preparedReadDb", "recordCount, columnCount : " + String.valueOf(csracc.getCount()) + " " + String.valueOf(csracc.getColumnCount()));
+            csracc.moveToFirst();
+            return true;
+        }
+    }
+
+    protected static Vector3 readDBL(int idx){
+        Log.d("readDBLine", "start. index: " + idx);
+        Vector3 vctr = new Vector3();
+        if(!csracc.moveToPosition(idx)) {
+            Log.e("readDBL", "out of index");
+            return Vector3.ZERO;
+        }
+        else {
+            try {
+                vctr.set(csracc.getFloat(0), csracc.getFloat(1), csracc.getFloat(2));
+            } catch (CursorIndexOutOfBoundsException e) {
+                Log.e("readDBL", "CusorIndexOutOfBoundsException");
+            }
+            return vctr;
+        }
+    }
+
     //String一つをDBに書き込む(一応寝た時間を想定:writeDBS("sleeptime","sleeptime",String timestamp))
     public static void writeDB(String key,String table,String arg){
         ContentValues values = new ContentValues();
@@ -252,6 +326,7 @@ public class Analyze{
         Log.d("writeDB", "insert done");
     }
 
+    /*
     //ダミーデータをDBに書き込む、不要なら後で削除します
     public static void writeDummyData() {
         ContentValues values = new ContentValues();
@@ -264,4 +339,5 @@ public class Analyze{
         MainActivity.mydb.insert("accelerations", null, values);
         Log.d("writeDB", "DummyData insert done");
     }
+    */
 }
