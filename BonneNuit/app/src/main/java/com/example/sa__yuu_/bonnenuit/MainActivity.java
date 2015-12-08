@@ -2,6 +2,8 @@ package com.example.sa__yuu_.bonnenuit;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -71,6 +73,18 @@ public class MainActivity extends Activity {
             Log.d("INFO", "SensorService を起動します。");
         }
 
+        Calendar changeDate = new GregorianCalendar();
+        // 翌日の 01:00 に繰り返す
+        changeDate.set(changeDate.get(Calendar.YEAR), changeDate.get(Calendar.MONTH), changeDate.get(Calendar.DAY_OF_MONTH), 01, 00);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent setAlarmServiceIntent = new Intent(getBaseContext(), SetAlarmService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(getBaseContext(), 0, setAlarmServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, changeDate.getTimeInMillis(), AlarmManager.INTERVAL_DAY,  pendingIntent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         // accelerations に値が保存させているかどうかを見るよう
         getAccelerations();
         drawGrapth();

@@ -15,17 +15,20 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class SensorService extends Service implements SensorEventListener {
-    static final String TAG="SensorService";
+    static final String TAG = "SensorService";
     private int startId;
 
     private SensorManager manager;
 
+    private Calendar nextInsert;
     private Vector3 previousAccelerometer;
     private Vector3 currentAccelerometer;
     private Vector3 deltaAccelerometer;
+    private float maxDeltaLength = 0f;
 
     static SQLiteDatabase mydb;
 
@@ -74,27 +77,32 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            previousAccelerometer = currentAccelerometer;
-            currentAccelerometer = new Vector3(
-                    event.values[SensorManager.DATA_X],
-                    event.values[SensorManager.DATA_Y],
-                    event.values[SensorManager.DATA_Z]
-            );
+        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) {
+            return;
+        }
 
-            if (previousAccelerometer == null) {
-                deltaAccelerometer = Vector3.ZERO;
-            } else {
-                deltaAccelerometer = new Vector3();
-                deltaAccelerometer.set(currentAccelerometer);
-                deltaAccelerometer.subtract(previousAccelerometer);
-            }
+        previousAccelerometer = currentAccelerometer;
+        currentAccelerometer = new Vector3(
+                event.values[SensorManager.DATA_X],
+                event.values[SensorManager.DATA_Y],
+                event.values[SensorManager.DATA_Z]
+        );
 
+        if (previousAccelerometer == null) {
+            deltaAccelerometer = Vector3.ZERO;
+        } else {
+            deltaAccelerometer = new Vector3();
+            deltaAccelerometer.set(currentAccelerometer);
+            deltaAccelerometer.subtract(previousAccelerometer);
+        }
+
+        Calendar now = Calendar.getInstance();
+        if (nextInsert == null || now.after(nextInsert)) {
             ContentValues values = new ContentValues();
             values.put("x", currentAccelerometer.x);
             values.put("y", currentAccelerometer.y);
             values.put("z", currentAccelerometer.z);
-            values.put("delta_length", deltaAccelerometer.length());
+            values.put("delta_length", maxDeltaLength);
             mydb.insert("accelerations", null, values);
 
             String str = String.format("[%d] xyz: %f %f %f delta_length: %f",
@@ -103,6 +111,14 @@ public class SensorService extends Service implements SensorEventListener {
                     deltaAccelerometer.length()
             );
             Log.d("insert accelerations", str);
+
+            nextInsert = Calendar.getInstance();
+            nextInsert.add(Calendar.SECOND, 60);
+            maxDeltaLength = 0f;
+        } else {
+            if(deltaAccelerometer.length() > maxDeltaLength) {
+                maxDeltaLength = deltaAccelerometer.length();
+            }
         }
     }
 
