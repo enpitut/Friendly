@@ -70,7 +70,11 @@ public class MainActivity extends Activity {
         } else {
             Log.d("INFO", "SensorService を起動します。");
         }
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         // accelerations に値が保存させているかどうかを見るよう
         getAccelerations();
         drawGrapth();
