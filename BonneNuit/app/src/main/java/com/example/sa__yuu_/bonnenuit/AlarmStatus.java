@@ -1,6 +1,9 @@
 package com.example.sa__yuu_.bonnenuit;
 import java.io.Serializable;
+import java.util.ArrayList;
+
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class AlarmStatus implements Serializable {
@@ -62,5 +65,22 @@ public class AlarmStatus implements Serializable {
 
     public void delete(SQLiteDatabase db) {
         db.delete("alarms", "_id = ?", new String[]{String.format("%d", getId())});
+    }
+
+    public static ArrayList<AlarmStatus> getAll(SQLiteDatabase db)
+    {
+        Cursor cursor = db.query("alarms", new String[]{"_id", "enable", "day_of_week", "hour", "minute"}, null, null, null, null, "_id DESC");
+        ArrayList<AlarmStatus> settings = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex("_id"));
+                int enable_int = cursor.getInt(cursor.getColumnIndex("enable"));
+                int day_of_week = cursor.getInt(cursor.getColumnIndex("day_of_week"));
+                int hour = cursor.getInt(cursor.getColumnIndex("hour"));
+                int minute = cursor.getInt(cursor.getColumnIndex("minute"));
+                settings.add(new AlarmStatus(id, enable_int != 0, day_of_week, hour, minute));
+            } while (cursor.moveToNext());
+        }
+        return settings;
     }
 }

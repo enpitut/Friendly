@@ -1,19 +1,12 @@
 package com.example.sa__yuu_.bonnenuit;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -85,17 +78,7 @@ public class AlarmActivity extends Activity {
     protected void onStart() {
         super.onStart();
         alarmSettings.clear();
-        Cursor cursor = mydb.query("alarms", new String[]{"_id", "enable", "day_of_week", "hour", "minute"}, null, null, null, null, "_id DESC");
-        if (cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(cursor.getColumnIndex("_id"));
-                int enable_int = cursor.getInt(cursor.getColumnIndex("enable"));
-                int day_of_week = cursor.getInt(cursor.getColumnIndex("day_of_week"));
-                int hour = cursor.getInt(cursor.getColumnIndex("hour"));
-                int minute = cursor.getInt(cursor.getColumnIndex("minute"));
-                alarmSettings.add(new AlarmStatus(id, enable_int != 0, day_of_week, hour, minute));
-            } while (cursor.moveToNext());
-        }
+        alarmSettings.addAll(AlarmStatus.getAll(mydb));
         adapter.notifyDataSetChanged();
     }
 
