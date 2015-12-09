@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
         }
 
         Calendar changeDate = new GregorianCalendar();
-        // 翌日の 01:00 に繰り返す
+        // 01:00 にアラームの全解除と当日のアラームの設定を行う（繰り返し）
         changeDate.set(changeDate.get(Calendar.YEAR), changeDate.get(Calendar.MONTH), changeDate.get(Calendar.DAY_OF_MONTH), 01, 00);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent setAlarmServiceIntent = new Intent(getBaseContext(), SetAlarmService.class);
@@ -94,14 +94,15 @@ public class MainActivity extends Activity {
         int i = 0;
         List<PointValue> yValues = new ArrayList<PointValue>();
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        Cursor cursor = mydb.rawQuery("SELECT delta_length, timestamp FROM accelerations ORDER BY _id DESC LIMIT 60*10", new String[]{});
+        // TODO: 調整
+        Cursor cursor = mydb.rawQuery("SELECT avg, timestamp FROM accelerations ORDER BY _id DESC LIMIT 60*10", new String[]{});
         if (cursor.moveToFirst()) {
             do {
-                float delta_length = cursor.getFloat(cursor.getColumnIndex("delta_length"));
+                float avg = cursor.getFloat(cursor.getColumnIndex("avg"));// TODO: 調整
                 java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(cursor.getString(cursor.getColumnIndex("timestamp")));
                 Date date = new Date(timestamp.getTime());
 
-                yValues.add(new PointValue(-i, delta_length));
+                yValues.add(new PointValue(-i, avg));
                 AxisValue axisValue = new AxisValue(-i);
                 axisValue.setLabel(String.format("%02d:%02d", date.getHours(), date.getMinutes()));
                 axisValues.add(axisValue);
@@ -127,8 +128,8 @@ public class MainActivity extends Activity {
         chart.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
 
         final Viewport v = new Viewport(chart.getMaximumViewport());
-        v.top = 10; //example max value
-        v.bottom = 0;  //example min value
+        v.top = 0.5f; //example max value TODO: 調整
+        v.bottom = 0f;  //example min value
         chart.setMaximumViewport(v);
         chart.setCurrentViewport(v);
         //Optional step: disable viewport recalculations, thanks to this animations will not change viewport automatically.
@@ -179,16 +180,18 @@ public class MainActivity extends Activity {
     };
 
     private void getAccelerations() {
-        Cursor cursor = mydb.rawQuery("SELECT _id, x, y, z, delta_length, timestamp FROM accelerations ORDER BY _id DESC LIMIT 5", new String[]{});
+        Cursor cursor = mydb.rawQuery("SELECT _id, x, y, z, avg, max, min, timestamp FROM accelerations ORDER BY _id ASC LIMIT 20", new String[]{});
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(cursor.getColumnIndex("_id"));
                 float x = cursor.getFloat(cursor.getColumnIndex("x"));
                 float y = cursor.getFloat(cursor.getColumnIndex("y"));
                 float z = cursor.getFloat(cursor.getColumnIndex("z"));
-                float delta_length = cursor.getFloat(cursor.getColumnIndex("delta_length"));
+                float avg = cursor.getFloat(cursor.getColumnIndex("avg"));
+                float max = cursor.getFloat(cursor.getColumnIndex("max"));
+                float min = cursor.getFloat(cursor.getColumnIndex("min"));
                 java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(cursor.getString(cursor.getColumnIndex("timestamp")));
-                Log.d("getAccelerations", String.format("%d ||%f %f %f|| = %f, %s", id, x, y, z, delta_length, timestamp));
+                Log.d("getAccelerations", String.format("%d |%f %f %f| %f %f %f, %s", id, x, y, z, avg, max, min, timestamp));
             } while (cursor.moveToNext());
         }
     }
