@@ -46,6 +46,11 @@ public class AlarmListAdapter extends BaseAdapter {
         convertView = layoutInflater.inflate(R.layout.alarm_status,parent,false);
         AlarmStatus status = alarmList.get(position);
         ((TextView)convertView.findViewById(R.id.day_of_week)).setText(day[status.getDayOfWeek()]);
+        if (status.getDayOfWeek()==0) {
+            ((TextView)convertView.findViewById(R.id.day_of_week)).setTextColor(0xffff0000);
+        } else if (status.getDayOfWeek()==6) {
+            ((TextView)convertView.findViewById(R.id.day_of_week)).setTextColor(0xff0000ff);
+        }
         ((TextView)convertView.findViewById(R.id.alarm_time)).setText(status.getAlarmTime());
         ((TextView)convertView.findViewById(R.id.alarm_status)).setText(status.getEnable() ? "ON" : "OFF");
 
