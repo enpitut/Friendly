@@ -39,6 +39,10 @@ public class AlarmStatus implements Serializable {
         return enable;
     }
 
+    public int getDayOfWeek() {
+        return mDayOfWeek;
+    }
+
     public long getId() {
         return id;
     }
@@ -83,7 +87,7 @@ public class AlarmStatus implements Serializable {
     public static ArrayList<AlarmStatus> getAll(SQLiteDatabase db) {
         Cursor cursor = db.query("alarms",
                 new String[]{"_id", "enable", "day_of_week", "hour", "minute"},
-                null, null, null, null, "_id DESC");
+                null, null, null, null, "_id ASC");
 
         ArrayList<AlarmStatus> settings = new ArrayList<>();
         if (cursor.moveToFirst()) {
