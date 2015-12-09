@@ -78,7 +78,7 @@ header .burger_icon{
 	padding: 5px 10px;
 	text-transform: uppercase;
 
-	color: #43b779;
+	color: #fbc8c6;
 	font-family: "open_regular", Helvetica, Arial, sans-serif;
 	font-size: 14px;
 
@@ -126,7 +126,7 @@ header nav li a{
 header nav li a:hover,
 header nav li a:focus{
 	text-decoration: none;
-	color: #B7EFD1!important;
+	color: #fbc8c6!important;
 }
 
 header .social{
