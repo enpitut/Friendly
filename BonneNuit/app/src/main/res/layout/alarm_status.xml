@@ -13,9 +13,10 @@
         android:layout_alignParentStart="true"
         android:width="250dp" />
 
-    <ImageView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="alarmStatus"
         android:id="@+id/alarm_status" />
 
 </LinearLayout>

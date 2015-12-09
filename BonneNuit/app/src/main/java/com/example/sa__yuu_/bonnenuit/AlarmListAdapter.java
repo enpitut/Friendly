@@ -45,8 +45,7 @@ public class AlarmListAdapter extends BaseAdapter {
         convertView = layoutInflater.inflate(R.layout.alarm_status,parent,false);
 
         ((TextView)convertView.findViewById(R.id.alarm_time)).setText(alarmList.get(position).getAlarmTime());
-        ((ImageView)convertView.findViewById(R.id.alarm_status)).setImageResource((alarmList.get(position).getEnable() ? R.drawable.ic_action_on : R.drawable.ic_action_off));
-
+        ((TextView)convertView.findViewById(R.id.alarm_status)).setText((alarmList.get(position).getEnable() ? "ON" : "OFF"));
         return convertView;
     }
 }

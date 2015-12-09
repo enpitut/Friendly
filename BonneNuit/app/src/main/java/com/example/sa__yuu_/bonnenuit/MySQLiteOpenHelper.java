@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 class MySQLiteOpenHelper extends SQLiteOpenHelper {
     static final String DB = "bonneuit.db";
-    static final int DB_VERSION = 14;
+    static final int DB_VERSION = 16;
 
     static final String CREATE_ALRMS_TABLE = "CREATE TABLE alarms ( _id integer primary key autoincrement, enable boolean not null, day_of_week integer not null, hour integer not null, minute integer not null );";
     static final String DROP_ALRMS_TABLE = "DROP TABLE IF EXISTS alarms;";
