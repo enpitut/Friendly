@@ -39,6 +39,10 @@ public class AlarmStatus implements Serializable {
         return enable;
     }
 
+    public int getDayOfWeek() {
+        return mDayOfWeek;
+    }
+
     public long getId() {
         return id;
     }
