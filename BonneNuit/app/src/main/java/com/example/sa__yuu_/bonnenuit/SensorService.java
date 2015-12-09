@@ -28,7 +28,11 @@ public class SensorService extends Service implements SensorEventListener {
     private Vector3 previousAccelerometer;
     private Vector3 currentAccelerometer;
     private Vector3 deltaAccelerometer;
+
+    private float sumDeltaLength = 0f;
     private float maxDeltaLength = 0f;
+    private float minDeltaLength = 0f;
+    private int countDeltaLength = 0;
 
     static SQLiteDatabase mydb;
 
@@ -63,6 +67,8 @@ public class SensorService extends Service implements SensorEventListener {
             Sensor s = sensors.get(0);
             manager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
         }
+        nextInsert = Calendar.getInstance();
+        nextInsert.add(Calendar.SECOND, 60);
     }
 
     private void stopSensor() {
@@ -97,28 +103,44 @@ public class SensorService extends Service implements SensorEventListener {
         }
 
         Calendar now = Calendar.getInstance();
-        if (nextInsert == null || now.after(nextInsert)) {
+        if (now.after(nextInsert)) {
             ContentValues values = new ContentValues();
             values.put("x", currentAccelerometer.x);
             values.put("y", currentAccelerometer.y);
             values.put("z", currentAccelerometer.z);
-            values.put("delta_length", maxDeltaLength);
+            values.put("avg", sumDeltaLength / countDeltaLength);
+            values.put("max", maxDeltaLength);
+            values.put("min", minDeltaLength);
             mydb.insert("accelerations", null, values);
 
-            String str = String.format("[%d] xyz: %f %f %f delta_length: %f",
+            String str = String.format("[%d] xyz: %f %f %f | %f %f %f",
                     startId,
                     currentAccelerometer.x, currentAccelerometer.y, currentAccelerometer.z,
-                    deltaAccelerometer.length()
+                    sumDeltaLength / countDeltaLength, maxDeltaLength, maxDeltaLength
             );
             Log.d("insert accelerations", str);
 
             nextInsert = Calendar.getInstance();
             nextInsert.add(Calendar.SECOND, 60);
+
+            sumDeltaLength = 0f;
+            minDeltaLength = 1000f;
             maxDeltaLength = 0f;
+            countDeltaLength = 0;
         } else {
-            if(deltaAccelerometer.length() > maxDeltaLength) {
-                maxDeltaLength = deltaAccelerometer.length();
+            float length = deltaAccelerometer.length();
+
+            sumDeltaLength += length;
+
+            if(length > maxDeltaLength) {
+                maxDeltaLength = length;
             }
+
+            if(length < minDeltaLength) {
+                minDeltaLength = length;
+            }
+
+            countDeltaLength++;
         }
     }
 
