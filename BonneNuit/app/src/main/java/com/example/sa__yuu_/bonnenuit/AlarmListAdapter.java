@@ -42,11 +42,13 @@ public class AlarmListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        String[] day = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        String[] day = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         convertView = layoutInflater.inflate(R.layout.alarm_status,parent,false);
-        ((TextView)convertView.findViewById(R.id.day_of_week)).setText(day[alarmList.get(position).getDayOfWeek() % 7]);
-        ((TextView)convertView.findViewById(R.id.alarm_time)).setText(alarmList.get(position).getAlarmTime());
-        ((TextView)convertView.findViewById(R.id.alarm_status)).setText((alarmList.get(position).getEnable() ? "ON" : "OFF"));
+        AlarmStatus status = alarmList.get(position);
+        ((TextView)convertView.findViewById(R.id.day_of_week)).setText(day[status.getDayOfWeek()]);
+        ((TextView)convertView.findViewById(R.id.alarm_time)).setText(status.getAlarmTime());
+        ((TextView)convertView.findViewById(R.id.alarm_status)).setText(status.getEnable() ? "ON" : "OFF");
+
         return convertView;
     }
 }
