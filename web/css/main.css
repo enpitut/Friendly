@@ -321,6 +321,18 @@ a.app_link{
 	padding: 100px 0;
 }
 
+.about .android{
+    max-width: 500px;
+    position: relative;
+    display: inline-block;
+    text-align: center;
+}
+
+.about .android img{
+    width: 100%;
+    height: auto;
+}
+
 .about .features_list{
 	margin-left: 50px;
 }
@@ -427,14 +439,10 @@ a.app_link{
 footer{
 	padding: 100px 0;
 	text-align: center;
-    background-image: -moz-linear-gradient(bottom, #557ac2 0%, #557ac2 0.27%, #009c9e 99.46%, #009c9e 100%);
-    background-image: -o-linear-gradient(bottom, #557ac2 0%, #557ac2 0.27%, #009c9e 99.46%, #009c9e 100%);
-    background-image: -webkit-linear-gradient(bottom, #557ac2 0%, #557ac2 0.27%, #009c9e 99.46%, #009c9e 100%);
-    background-image: linear-gradient(bottom, #557ac2 0%, #557ac2 0.27%, #009c9e 99.46%, #009c9e 100%);
 }
 
 footer .app_platform li{
-	margin: 0 0 0 60px;
+	margin: 0 0 0 25px;
 }
 
 footer .app_platform li:first-child{
@@ -442,15 +450,15 @@ footer .app_platform li:first-child{
 }
 
 footer .copyright{
-	margin-top: 60px;
-	color: #ffffff;
+	margin-top: 25px;
+	color: #fbc8c6;
 	font-family: "open_regular", Helvetica, Arial, sans-serif;
 	font-size: 12px;
 	letter-spacing: .5px;
 }
 
 footer .copyright a{
-    color: #ffffff;
+    color: #fbc8c6;
     text-decoration: none;
 }
 
